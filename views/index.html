@@ -34,14 +34,12 @@
         }).then(refreshTodos);
       };
 
-      const refreshTodos = () => {
+      async function refreshTodos() {
         todosList.innerHTML = "";
-        fetch("/todos")
-          .then(res => res.json())
-          .then(data => {
-            data.payload.map(createTodo);
-          });
-      };
+        const response = await fetch("/todos");
+        const data = await response.json();
+        data.payload.map(createTodo);
+      }
 
       const createTodo = todo => {
         const li = document.createElement("li");

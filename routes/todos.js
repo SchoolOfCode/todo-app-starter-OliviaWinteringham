@@ -5,7 +5,7 @@ const router = express.Router();
 
 let db;
 
-connect("todoapp").then(database => {
+connect("toDo").then(database => {
   db = database;
 });
 
