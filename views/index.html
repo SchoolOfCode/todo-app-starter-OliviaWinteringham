@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>To Do App</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+      .completed {
+        color: green;
+      }
+    </style>
+  </head>
+  <body>
+    <input id="input" value="" />
+    <button id="btn" onclick="addTodo()">+</button>
+    <ul id="todos"></ul>
+
+    <script>
+      const input = document.getElementById("input");
+      const todosList = document.getElementById("todos");
+
+      const addTodo = () => {
+        const value = input.value;
+        fetch("/todos", {
+          method: "POST",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            title: value
+          })
+        }).then(refreshTodos);
+      };
+
+      const refreshTodos = () => {
+        todosList.innerHTML = "";
+        fetch("/todos")
+          .then(res => res.json())
+          .then(data => {
+            data.payload.map(createTodo);
+          });
+      };
+
+      const createTodo = todo => {
+        const li = document.createElement("li");
+        li.innerHTML = `<span>${todo.title}</span>`;
+        if (todo.completed) {
+          li.classList.add("completed");
+        } else {
+          const button = document.createElement("button");
+          button.onclick = () => {
+            updateCompleted(todo.id);
+          };
+          button.innerText = "done";
+          li.appendChild(button);
+        }
+        todosList.appendChild(li);
+      };
+
+      const updateCompleted = id => {
+        fetch(`/todos/${id}`, {
+          method: "PATCH",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json"
+          }
+        }).then(refreshTodos);
+      };
+
+      refreshTodos();
+    </script>
+  </body>
+</html>
